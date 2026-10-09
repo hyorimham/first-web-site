@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+  <a href="/write">글쓰기</a>
+  <ul>
+    {% for post in posts %}
+      <li><a href="/post/{{ post.id }}">{{ post.title }}</a> ({{ post.created_at }})</li>
+    {% else %}
+      <li>아직 글이 없어요.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}
