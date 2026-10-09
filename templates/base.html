@@ -8,5 +8,7 @@
   <h1><a href="/">비전공자 개발자 커뮤니티</a></h1>
   <hr>
   {% block content %}{% endblock %}
+  <!-- static 폴더의 script.js 불러오기 -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
