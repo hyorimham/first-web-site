@@ -81,7 +81,7 @@ def view(post_id):
     return render_template("view.html", post=post)
 
 
-@app.route("/edit/<int:post_id>", methods=["GET", "POST"])
+@app.route("/post/<int:post_id>/edit", methods=["GET", "POST"])
 def edit(post_id):
     conn = get_db()
     try:
@@ -110,7 +110,7 @@ def edit(post_id):
     return render_template("edit.html", post=post)
 
 
-@app.route("/delete/<int:post_id>", methods=["POST"])
+@app.route("/post/<int:post_id>/delete", methods=["POST"])
 def delete(post_id):
     conn = get_db()
     try:
