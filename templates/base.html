@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <title>비전공자 개발자 커뮤니티</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <h1><a href="/">비전공자 개발자 커뮤니티</a></h1>
   <hr>
   {% block content %}{% endblock %}
-  <!-- static 폴더의 script.js 불러오기 -->
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
