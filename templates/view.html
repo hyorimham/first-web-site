@@ -5,9 +5,9 @@
   <p>{{ post.content }}</p>
 
   <a href="/">목록으로</a>
-  <a href="/edit/{{ post.id }}">수정</a>
+  <a href="/post/{{ post.id }}/edit">수정</a>
 
-  <form method="POST" action="/delete/{{ post.id }}" style="display:inline;">
+  <form method="POST" action="/post/{{ post.id }}/delete" style="display:inline;">
     <button type="submit" class="btn-danger">삭제</button>
   </form>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
   <h2>글 수정</h2>
-  <form method="POST" action="/edit/{{ post.id }}">
+  <form method="POST" action="/post/{{ post.id }}/edit">
     <input type="text" name="title" value="{{ post.title }}" required><br>
     <textarea name="content" rows="8" cols="50" required>{{ post.content }}</textarea><br>
     <button type="submit">저장</button>
