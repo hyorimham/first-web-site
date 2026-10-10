@@ -81,6 +81,50 @@ def view(post_id):
     return render_template("view.html", post=post)
 
 
+@app.route("/edit/<int:post_id>", methods=["GET", "POST"])
+def edit(post_id):
+    conn = get_db()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM posts WHERE id = %s", (post_id,))
+            post = cur.fetchone()
+            if post is None:
+                abort(404)
+
+            if request.method == "POST":
+                title = request.form.get("title", "").strip()
+                content = request.form.get("content", "").strip()
+                if not title or not content or len(title) > 200:
+                    abort(400)
+                cur.execute(
+                    "UPDATE posts SET title = %s, content = %s WHERE id = %s",
+                    (title, content, post_id),
+                )
+                conn.commit()
+                return redirect(f"/post/{post_id}")
+    except pymysql.MySQLError:
+        conn.rollback()
+        abort(500)
+    finally:
+        conn.close()
+    return render_template("edit.html", post=post)
+
+
+@app.route("/delete/<int:post_id>", methods=["POST"])
+def delete(post_id):
+    conn = get_db()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM posts WHERE id = %s", (post_id,))
+        conn.commit()
+    except pymysql.MySQLError:
+        conn.rollback()
+        abort(500)
+    finally:
+        conn.close()
+    return redirect("/")
+
+
 if __name__ == "__main__":
     init_db()
     app.run(host="0.0.0.0", port=5000)
