@@ -23,8 +23,8 @@ def init_db():
         try:
             conn = get_db()
             break
-        except pymysql.err.OperationalError:
-            print("DB 준비 중... 2초 후 다시 시도")
+        except pymysql.err.OperationalError as e:
+            print("DB 준비 중... 2초 후 다시 시도 //", e)
             time.sleep(2)
     else:
         raise RuntimeError("DB에 연결하지 못했어요")
