@@ -1,13 +1,56 @@
+
 {% extends "base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
 {% block content %}
-  <h2>{{ post.title }}</h2>
-  <p>{{ post.created_at }}</p>
-  <p>{{ post.content }}</p>
+<section class="page-heading">
+  <a class="back-link"
+     href="{{ url_for('board_view', board_id=post.board_id) }}">
+    ← {{ post.board_name }}으로 돌아가기
+  </a>
 
-  <a href="/">목록으로</a>
-  <a href="/post/{{ post.id }}/edit">수정</a>
+  <span class="eyebrow">COMMUNITY POST</span>
+  <p class="post-category">{{ post.board_name }}</p>
+</section>
 
-  <form method="POST" action="/post/{{ post.id }}/delete" style="display:inline;">
-    <button type="submit" class="btn-danger">삭제</button>
-  </form>
+<article class="article-panel">
+  <header class="article-header">
+    <h1>{{ post.title }}</h1>
+
+    <div class="article-meta">
+      <span>작성일</span>
+      <time>
+        {{ post.created_at.strftime('%Y-%m-%d %H:%M')
+           if post.created_at else '' }}
+      </time>
+    </div>
+  </header>
+
+  <div class="article-content">{{ post.content }}</div>
+
+  <footer class="article-actions">
+    <a class="button secondary"
+       href="{{ url_for('board_view', board_id=post.board_id) }}">
+      목록으로
+    </a>
+
+    <div class="action-group">
+      <a class="button secondary"
+         href="{{ url_for('edit', post_id=post.id) }}">
+        수정하기
+      </a>
+
+      <form
+        action="{{ url_for('delete', post_id=post.id) }}"
+        method="post"
+        onsubmit="return confirm('정말 이 게시글을 삭제할까요?');"
+      >
+        <button class="button danger" type="submit">
+          삭제하기
+        </button>
+      </form>
+    </div>
+  </footer>
+</article>
 {% endblock %}
