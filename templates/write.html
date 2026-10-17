@@ -1,8 +1,61 @@
+
 {% extends "base.html" %}
+
+{% block title %}글쓰기 - {{ board.name }}{% endblock %}
+
 {% block content %}
-  <form method="POST" action="/write">
-    <input type="text" name="title" placeholder="제목" required><br>
-    <textarea name="content" placeholder="내용" rows="8" cols="50" required></textarea><br>
-    <button type="submit">등록</button>
+<section class="page-heading">
+  <a class="back-link"
+     href="{{ url_for('board_view', board_id=board.id) }}">
+    ← {{ board.name }}으로 돌아가기
+  </a>
+
+  <span class="eyebrow">NEW POST</span>
+  <h1>새 게시글 작성</h1>
+  <p>{{ board.name }}에 새로운 이야기를 남겨보세요.</p>
+</section>
+
+<section class="form-panel">
+  <form
+    class="post-form"
+    action="{{ url_for('write', board_id=board.id) }}"
+    method="post"
+  >
+    <div class="form-group">
+      <label for="title">제목</label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        maxlength="200"
+        placeholder="게시글 제목을 입력하세요"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="content">내용</label>
+      <textarea
+        id="content"
+        name="content"
+        rows="14"
+        placeholder="내용을 자유롭게 작성하세요."
+        required
+      ></textarea>
+    </div>
+
+    <div class="form-actions">
+      <a
+        class="button secondary"
+        href="{{ url_for('board_view', board_id=board.id) }}"
+      >
+        취소
+      </a>
+
+      <button class="button primary" type="submit">
+        게시글 등록하기
+      </button>
+    </div>
   </form>
+</section>
 {% endblock %}
