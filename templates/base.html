@@ -1,14 +1,50 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>비전공자 개발자 커뮤니티</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>{% block title %}비전공자 개발자 커뮤니티{% endblock %}</title>
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+  >
 </head>
+
 <body>
-  <h1><a href="/">비전공자 개발자 커뮤니티</a></h1>
-  <hr>
-  {% block content %}{% endblock %}
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="{{ url_for('index') }}">
+        <span class="brand-mark">비</span>
+        <span>비전공자 개발자 커뮤니티</span>
+      </a>
+
+      <nav class="main-nav" aria-label="주요 메뉴">
+        <a href="{{ url_for('index') }}">홈</a>
+      </nav>
+
+      <a class="header-button" href="{{ url_for('index') }}">
+        게시판 둘러보기 <span>↗</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <a class="brand footer-brand" href="{{ url_for('index') }}">
+        <span class="brand-mark">비</span>
+        <span>비전공자 개발자 커뮤니티</span>
+      </a>
+
+      <p>비전공자도 함께 배우고 성장하는 개발자 커뮤니티</p>
+      <span class="copyright">© 비전공자 개발자 커뮤니티</span>
+    </div>
+  </footer>
 </body>
 </html>
