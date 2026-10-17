@@ -1,0 +1,117 @@
+
+{% extends "base.html" %}
+
+{% block title %}{{ board.name }}{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <a class="back-link" href="{{ url_for('index') }}">
+    ← 전체 게시판
+  </a>
+
+  <span class="eyebrow">COMMUNITY BOARD</span>
+  <h1>{{ board.name }}</h1>
+  <p>{{ board.description or '자유롭게 이야기를 나눠보세요.' }}</p>
+</section>
+
+<section class="post-section">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">POSTS</span>
+      <h2>게시글 목록</h2>
+    </div>
+
+    <a class="button primary"
+       href="{{ url_for('write', board_id=board.id) }}">
+      ＋ 글쓰기
+    </a>
+  </div>
+
+  <form
+    class="search-form"
+    action="{{ url_for('board_view', board_id=board.id) }}"
+    method="get"
+  >
+    <label class="visually-hidden" for="search_type">
+      검색 범위
+    </label>
+
+    <select id="search_type" name="search_type">
+      <option value="all"
+        {% if search_type == 'all' %}selected{% endif %}>
+        제목 + 내용
+      </option>
+      <option value="title"
+        {% if search_type == 'title' %}selected{% endif %}>
+        제목
+      </option>
+      <option value="content"
+        {% if search_type == 'content' %}selected{% endif %}>
+        내용
+      </option>
+    </select>
+
+    <label class="visually-hidden" for="search">
+      검색어
+    </label>
+
+    <input
+      type="search"
+      id="search"
+      name="search"
+      value="{{ search }}"
+      placeholder="검색어를 입력하세요"
+    >
+
+    <button class="button secondary" type="submit">
+      검색
+    </button>
+
+    {% if search %}
+      <a class="button text-button"
+         href="{{ url_for('board_view', board_id=board.id) }}">
+        초기화
+      </a>
+    {% endif %}
+  </form>
+
+  {% if search %}
+    <p class="search-result">
+      '{{ search }}' 검색 결과: {{ posts|length }}개
+    </p>
+  {% endif %}
+
+  <div class="post-list">
+    {% for post in posts %}
+      <a class="post-row"
+         href="{{ url_for('view', post_id=post.id) }}">
+
+        <span class="post-number">{{ loop.index }}</span>
+
+        <div class="post-info">
+          <h3>{{ post.title }}</h3>
+          <span class="post-date">
+            {{ post.created_at.strftime('%Y-%m-%d %H:%M')
+               if post.created_at else '' }}
+          </span>
+        </div>
+
+        <span class="post-arrow">↗</span>
+      </a>
+    {% else %}
+      <div class="empty-state">
+        {% if search %}
+          검색 결과가 없습니다. 다른 검색어를 입력해 보세요.
+        {% else %}
+          아직 작성된 게시글이 없습니다. 첫 글을 작성해 보세요!
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="list-footer">
+    <span>전체 {{ posts|length }}개</span>
+    <a href="{{ url_for('index') }}">게시판 목록으로 돌아가기</a>
+  </div>
+</section>
+{% endblock %}
