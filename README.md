@@ -1,6 +1,6 @@
 # first-web-site
 # 비전공자 개발자 커뮤니티
-Flask + MySQL + Docker로 만든 간단한 게시판입니다.
+Flask + MySQL + Docker로 만든 연습용 간단한 게시판입니다.
 
 ## 실행 방법
 1. .env.example을 복사해서 .env 만들기
