@@ -1,11 +1,90 @@
+
 {% extends "base.html" %}
+
+{% block title %}게시판 목록{% endblock %}
+
 {% block content %}
-  <a href="/write">글쓰기</a>
-  <ul>
-    {% for post in posts %}
-      <li><a href="/post/{{ post.id }}">{{ post.title }}</a> ({{ post.created_at }})</li>
-    {% else %}
-      <li>아직 글이 없어요.</li>
-    {% endfor %}
-  </ul>
+<section class="hero">
+  <div class="eyebrow">WELCOME TO FIRST COMMUNITY</div>
+  <h1>무엇이든 함께 나누는<br>
+    <span>개발자 커뮤니티</span>
+  </h1>
+  <p>관심 있는 게시판에 들어가 이야기를 나눠보세요.</p>
+  <div class="hero-decoration">✳</div>
+</section>
+
+<section class="section-heading">
+  <div>
+    <span class="eyebrow">COMMUNITY</span>
+    <h2>게시판</h2>
+  </div>
+  <span class="count-pill">{{ boards|length }}개의 게시판</span>
+</section>
+
+<div class="board-grid">
+  {% for board in boards %}
+  <a class="board-card"
+     href="{{ url_for('board_view', board_id=board.id) }}">
+    <div class="board-icon">
+      {% if loop.index == 1 %}
+        ✎
+      {% elif loop.index == 2 %}
+        ☷
+      {% else %}
+        ⌘
+      {% endif %}
+    </div>
+
+    <div class="board-card-content">
+      <h3>{{ board.name }}</h3>
+      <p>
+        {{ board.description or '게시판에 자유롭게 글을 남겨보세요.' }}
+      </p>
+      <span class="board-meta">
+        게시글 {{ board.post_count }}개 <span>↗</span>
+      </span>
+    </div>
+  </a>
+  {% else %}
+  <div class="empty-state">
+    아직 게시판이 없습니다. 아래에서 첫 게시판을 만들어 보세요.
+  </div>
+  {% endfor %}
+</div>
+
+<section class="create-board-panel">
+  <div>
+    <span class="eyebrow">MAKE A SPACE</span>
+    <h2>새 게시판 만들기</h2>
+    <p>주제별로 대화 공간을 나눠보세요.</p>
+  </div>
+
+  <form action="{{ url_for('create_board') }}"
+        method="post"
+        class="board-form">
+
+    <label for="name">게시판 이름</label>
+    <input
+      id="name"
+      name="name"
+      maxlength="100"
+      placeholder="예: 질문게시판"
+      required
+    >
+
+    <label for="description">
+      설명 <span class="muted">(선택)</span>
+    </label>
+    <input
+      id="description"
+      name="description"
+      maxlength="255"
+      placeholder="게시판에 대한 짧은 설명"
+    >
+
+    <button class="button primary" type="submit">
+      게시판 만들기 <span>＋</span>
+    </button>
+  </form>
+</section>
 {% endblock %}
