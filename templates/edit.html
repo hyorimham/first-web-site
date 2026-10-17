@@ -1,10 +1,60 @@
+
 {% extends "base.html" %}
+
+{% block title %}게시글 수정 - {{ post.title }}{% endblock %}
+
 {% block content %}
-  <h2>글 수정</h2>
-  <form method="POST" action="/post/{{ post.id }}/edit">
-    <input type="text" name="title" value="{{ post.title }}" required><br>
-    <textarea name="content" rows="8" cols="50" required>{{ post.content }}</textarea><br>
-    <button type="submit">저장</button>
-    <a href="/post/{{ post.id }}">취소</a>
+<section class="page-heading">
+  <a class="back-link"
+     href="{{ url_for('view', post_id=post.id) }}">
+    ← 게시글로 돌아가기
+  </a>
+
+  <span class="eyebrow">EDIT POST</span>
+  <h1>게시글 수정</h1>
+  <p>작성한 게시글의 제목과 내용을 수정할 수 있어요.</p>
+</section>
+
+<section class="form-panel">
+  <form
+    class="post-form"
+    action="{{ url_for('edit', post_id=post.id) }}"
+    method="post"
+  >
+    <div class="form-group">
+      <label for="title">제목</label>
+      <input
+        type="text"
+        id="title"
+        name="title"
+        maxlength="200"
+        value="{{ post.title }}"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="content">내용</label>
+      <textarea
+        id="content"
+        name="content"
+        rows="14"
+        required
+      >{{ post.content }}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <a
+        class="button secondary"
+        href="{{ url_for('view', post_id=post.id) }}"
+      >
+        취소
+      </a>
+
+      <button class="button primary" type="submit">
+        수정 내용 저장
+      </button>
+    </div>
   </form>
+</section>
 {% endblock %}
