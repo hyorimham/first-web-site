@@ -1,4 +1,3 @@
-
 import os
 import time
 import pymysql
@@ -111,7 +110,7 @@ def create_board():
     name = request.form["name"].strip()
     description = request.form["description"].strip()
 
-    # 브라우저의 maxlengh 는 우회할 수 있으니 서버에서도 검사
+    # 브라우저의 maxlength 는 우회할 수 있으니 서버에서도 검사
     if not name or len(name) > 100 or len(description) > 255:
         abort(400)
 
@@ -160,7 +159,7 @@ def write(board_id):
     # Create
     board = find_one("SELECT * FROM boards WHERE id = %s",
 (board_id,))
-
+    
     if request.method == "POST":
         title = request.form["title"].strip()
         content = request.form["content"].strip()
