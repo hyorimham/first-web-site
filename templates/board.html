@@ -90,10 +90,7 @@
 
         <div class="post-info">
           <h3>{{ post.title }}</h3>
-          <span class="post-date">
-            {{ post.created_at.strftime('%Y-%m-%d %H:%M')
-               if post.created_at else '' }}
-          </span>
+          <span class="post-date">{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
         </div>
 
         <span class="post-arrow">↗</span>
