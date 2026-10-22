@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
+{% block title %}404 - 페이지를 찾을 수 없습니다{% endblock %} 
+
 {% block content %}
-<div style="text-align: center; padding: 40px 0;">
-    <h2>404 - 페이지를 찾을 수 없습니다</h2>
-    <p style="margin: 15px 0 25px 0; color: #6b7280;">요청하신 게시글이 존재하지 않거나 삭제되었습니다.</p>
-    <a href="/" class="btn">메인으로 돌아가기</a>
+<div class="empty-state">
+  <h1>404</h1>
+    <p>요청하신 페이지가 존재하지 않거나 삭제되었습니다.</p>
+    <a class="button primary" href="{{ url_for('index') }}">메인으로 돌아가기</a>
 </div>
 {% endblock %}
