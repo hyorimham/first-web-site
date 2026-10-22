@@ -81,6 +81,18 @@ select:focus-visible {
   border: 0;
 }
 
+/* 카드 모양 공통: 흰 배경 + 테두리 + 둥근 모서리 + 그림자 */
+.board-card,
+.create-board-panel,
+.post-section,
+.form-panel,
+.article-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
 /* =========================
    2. 상단 헤더
 ========================= */
@@ -124,10 +136,6 @@ select:focus-visible {
   color: var(--white);
   font-size: 19px;
   font-weight: 800;
-}
-
-.brand-light {
-  font-weight: 500;
 }
 
 .main-nav {
@@ -322,10 +330,6 @@ h3 {
   gap: 18px;
   min-width: 0;
   padding: 25px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--white);
-  box-shadow: var(--shadow);
   transition:
     transform 0.18s ease,
     border-color 0.18s ease,
@@ -385,10 +389,6 @@ h3 {
   gap: 36px;
   align-items: start;
   padding: 34px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--white);
-  box-shadow: var(--shadow);
 }
 
 .create-board-panel h2 {
@@ -513,10 +513,6 @@ textarea {
 ========================= */
 .post-section {
   padding: 30px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--white);
-  box-shadow: var(--shadow);
 }
 
 .post-section .section-heading {
@@ -616,10 +612,6 @@ textarea {
 .form-panel {
   max-width: 850px;
   padding: 34px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--white);
-  box-shadow: var(--shadow);
 }
 
 .post-form {
@@ -648,10 +640,6 @@ textarea {
 ========================= */
 .article-panel {
   padding: 38px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--white);
-  box-shadow: var(--shadow);
 }
 
 .article-header {
