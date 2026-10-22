@@ -2,6 +2,7 @@ services:
   db:
     image: mysql:8.0
     env_file: .env
+    command: --default-time-zone=+09:00
     volumes:
       - db_data:/var/lib/mysql
 
