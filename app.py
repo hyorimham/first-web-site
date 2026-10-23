@@ -12,6 +12,7 @@ app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # 업로드 최대 5MB
 UPLOAD_DIR = os.path.join(app.root_path, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 ALLOWED_EXT = {"png", "jpg", "jpeg", "gif", "pdf", "txt", "zip", "hwp", "docx", "pptx", "xlsx"}
+IMAGE_EXT = {"png", "jpg", "jpeg", "gif"}
 
 def get_db():
     """기존 .env 파일의 설정으로 MySQL에 연결한다."""
@@ -426,6 +427,48 @@ def my_profile():
     if "user_id" not in session:
         return redirect(url_for("login"))
     return redirect(url_for("profile", username=session["username"]))
+
+
+@app.route("/me/edit", methods=["GET", "POST"])
+def edit_profile():
+    # 내 정보 수정 (로그인한 본인만)
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    user = find_one(
+        "SELECT name, email, school, profile_image FROM users WHERE id = %s",
+        (session["user_id"],),
+    )
+
+    if request.method =="POST":
+        name = request.form["name"].strip()
+        email = request.form["email"].strip()
+        school = request.form["school"]. strip()
+        if not name or not email:
+            return render_template("edit_profile.html", user=user, error="이름과 이메일은 꼭 입력해야 합니다.")
+
+        _, image_path = save_upload(request.files.get("profile_image"), IMAGE_EXT)
+        image = image_path or user["profile_image"]  # 새 사진이 없으면 원래 사진 유지
+
+        try:
+            db_execute(
+                "UPDATE users SET name = %s, email = %s, school = %s, profile_image = %s WHERE id = %s",
+                (name, email, school, image, session["user_id"]),
+            )
+        except pymysql.err.IntegrityError:  # email 이 UNIQUE
+            return render_template("edit_profile.html", user=user, error="이미 사용 중인 이메일입니다.")
+
+        return redirect(url_for("my_profile"))
+
+    return render_template("edit_profile.html", user=user)
+
+
+@app.route("/user/<username>/image")
+def profile_image(username):
+    # 프로필 사진 보여주기 (파일 이름이 아니라 아이디로 찾는다)
+    user = find_one("SELECT profile_image FROM users WHERE username = %s", (username,))
+    if not user["profile_image"]:
+        abort(404)
+    return send_from_directory(UPLOAD_DIR, user["profile_image"])
 
 
 @app.errorhandler(404)

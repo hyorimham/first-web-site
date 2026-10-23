@@ -905,3 +905,9 @@ textarea {
   .profile-panel {
     margin-bottom: 24px;
   }
+  .profile-image {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
