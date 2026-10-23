@@ -2,7 +2,7 @@ import os
 import time
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, render_template, request, redirect, abort, url_for
+from flask import Flask, render_template, request, redirect, abort, url_for, session
 
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]  # .env 파일에 SECRET_KEY=랜덤문자열 을 넣어야 한다
@@ -257,10 +257,33 @@ def signup():
         except pymysql.err.IntegrityError:  # username 또는 email이 UNIQUE 제약 조건에 위배될 때 발생
             return render_template("signup.html", error="이미 존재하는 사용자 아이디 또는 이메일입니다.")
 
-        return redirect(url_for("index"))
+        return redirect(url_for("login"))
 
     return render_template("signup.html")
 
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        password = request.form["password"]
+
+        user = db_select("SELECT * FROM users WHERE username = %s", (username,))
+        if not user or not check_password_hash(user[0]["password_hash"], password):
+            return render_template("login.html", error="아이디 또는 비밀번호가 잘못되었습니다.")
+
+        session.clear()
+        session["user_id"] = user[0]["id"]
+        session["username"] = user[0]["username"]
+        return redirect(url_for("index"))
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("index"))
 
 
 @app.errorhandler(404)
