@@ -91,7 +91,7 @@ def init_db():
             file_name VARCHAR(255),
             file_path VARCHAR(255),
             create_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            INDEX (board_id),
+            INDEX (board_id)
         )
     """)
 
