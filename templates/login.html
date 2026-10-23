@@ -27,6 +27,10 @@
      <a class="button secondary" href="{{ url_for('signup') }}">회원가입</a>
      <button class="button primary" type="submit">로그인</button>
     </div>
+    <p class="muted">
+      <a href="{{ url_for('find_id') }}">아이디 찾기</a>
+      <a href="{{ url_for('reset_pw') }}">비밀번호 찾기</a>
+    </p>
   </form>
 </section>
 {% endblock %} 

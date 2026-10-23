@@ -343,6 +343,62 @@ def login():
     return render_template("login.html")
 
 
+@app.route("/find-id", methods=["GET", "POST"])
+def find_id():
+    if request.method == "POST":
+        name = request.form["name"].strip()
+        email = request.form["email"].strip()
+
+        rows = db_select("SELECT username FROM users WHERE name = %s AND email = %s", (name,email))
+        if not rows:
+            return render_template("find_id.html", error="일치하는 회원 정보가 없습니다.")
+        return render_template("find_id.html", found=rows[0]["username"])
+
+    return render_template("find_id.html")
+
+
+@app.route("/reset-pw", methods=["GET", "POST"])
+def reset_pw():
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        name = request.form["name"].strip()
+        email = request.form["email"].strip()
+
+        rows = db_select(
+            "SELECT id FROM users WHERE username = %s AND name = %s AND email = %s",
+            (username, name, email),
+        )
+        if not rows:
+            return render_template("reset_pw.html", error="일치하는 회원 정보가 없습니다.")
+
+        session["reset_user_id"] = rows[0]["id"]  # 확인된 회원 번호를 기억
+        return redirect(url_for("reset_pw_new"))
+
+    return render_template("reset_pw.html")
+
+
+@app.route("/reset-pw/new", methods=["GET", "POST"])
+def reset_pw_new():
+    # 2단계: 새 비밀번호 설정 (1단계를 통과한 사람만)
+    user_id = session.get("reset_user_id")
+    if not user_id:
+        return redirect(url_for("reset_pw"))
+
+    if request.method == "POST":
+        new_pw = request.form["new_pw"]
+        if len(new_pw) < 8:
+            return render_template("reset_pw_new.html", error="새 비밀번호는 8자 이상이어야 합니다.")
+
+        db_execute(
+            "UPDATE users SET passowrd_hash = %s WHERE id = %s",
+            (generate_password_hash(new_pw), user_id)
+        )
+        session.pop("reset_user_id")    # 다 썼으면 지운다
+        return redirect(url_for("login"))
+
+    return render_template("reset_pw_new.html")
+
+
 @app.route("/logout")
 def logout():
     session.clear()

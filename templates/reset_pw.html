@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}비밀번호 찾기{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <span class="eyebrow">RESET PASSWORD</span>
+  <h1>비밀번호 찾기</h1>
+  <p>회원 정보가 맞으면 새 비밀번호로 바꿀 수 있어요.</p>
+</section>
+
+<section class="form-panel">
+  <form class="post-form" method="post">
+    {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
+    <div class="form-actions">
+      <button class="button primary" type="submit">비밀번호 변경</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

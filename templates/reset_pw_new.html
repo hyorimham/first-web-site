@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}새 비밀번호 설정{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <span class="eyebrow">NEW PASSWORD</span>
+  <h1>새 비밀번호 설정</h1>
+  <p>본인 확인이 끝났어요. 새 비밀번호를 입력하세요.</p>
+</section>
+
+<section class="form-panel">
+  <form class="post-form" method="post">
+    {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
+
+    <div class="form-group">
+      <label for="new_pw">새 비밀번호 (8자 이상)</label>
+      <input id="new_pw" name="new_pw" type="password" minlength="8" required>
+    </div>
+
+    <div class="form-actions">
+      <button class="button primary" type="submit">비밀번호 변경</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

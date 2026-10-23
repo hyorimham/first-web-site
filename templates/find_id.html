@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}아이디 찾기{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <span class="eyebrow">FIND ID</span>
+  <h1>아이디 찾기</h1>
+  <p>가입할 때 입력한 이름과 이메일을 입력하세요.</p>
+</section>
+
+<section class="form-panel">
+  {% if found %}
+    <p>회원님의 아이디는 <strong>{{ found }}</strong> 입니다.</p>
+    <div class="form-actions">
+      <a class="button primary" href="{{ url_for('login') }}">로그인하러 가기</a>
+    </div>
+  {% else %}
+  <form class="post-form" method="post">
+    {% if error %}<p class="form-error">{{ error }}</p>{% endif %}
+
+    <div class="form-group">
+      <label for="name">이름</label>
+      <input id="name" name="name" required>
+    </div>
+    <div class="form-group">
+      <label for="email">이메일</label>
+      <input id="email" name="email" type="email" required>
+    </div>
+
+    <div class="form-actions">
+      <button class="button primary" type="submit">아이디 찾기</button>
+    </div>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}
