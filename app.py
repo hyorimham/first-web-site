@@ -77,7 +77,7 @@ def init_db():
             email VARCHAR(100) NOT NULL UNIQUE,
             school VARCHAR(100) NOT NULL DEFAULT '',
             profile_image VARCHAR(255),
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
     db_execute("""
@@ -88,7 +88,20 @@ def init_db():
             create_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
-
+    db_execute("""
+        CREATE TABLE IF NOT EXISTS posts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            board_id INT NOT NULL,
+            user_id INT NOT NULL,
+            title VARCHAR(200) NOT NULL,
+            content TEXT NOT NULL,
+            secret_pw_hash VARCHAR(255),
+            file_name VARCHAR(255),
+            ffile_path VARCHAR(255),
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            INDEX (board_id)
+        )
+    """)
    # 기본 게시판 만들기 (이미 있으면 IGNORE 가 조용히 넘어간다)
     db_execute("""
         INSERT IGNORE INTO boards (name, description) VALUES
