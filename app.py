@@ -95,7 +95,14 @@ def init_db():
         )
     """)
 
-            
+   # 기본 게시판 만들기 (이미 있으면 IGNORE 가 조용히 넘어간다)
+    db_execute("""
+        INSERT IGNORE INTO boards (name, description) VALUES (%s, %s)",
+        VALUES
+            ('자유게시판', '자유롭게 글을 쓸 수 있는 게시판입니다.'),
+            ('공지사항', '중요한 공지사항을 확인할 수 있는 게시판입니다.'),
+            ('질문과 답변', '질문과 답변을 주고받는 게시판입니다.')
+        """)         
 
 
 @app.route("/")
