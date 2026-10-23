@@ -81,14 +81,14 @@ def save_upload(file, allowed=ALLOWED_EXT):
     if not file or not file.filename:
         return None, None   # 파일을 안 올렸으면
 
-    ext = file.filename.replit(".",1)[-1].lower()
+    ext = file.filename.rsplit(".",1)[-1].lower()
     if "." not in file.filename or ext not in allowed:
         abort(400, description="허용되지 않은 파일 형식입니다.")
 
 
     save_name = f"{uuid.uuid4().hex}.{ext}"  # 겹치치 않는 랜덤 이름
     file.save(os.path.join(UPLOAD_DIR, save_name))
-    return file.filename. save_name
+    return file.filename, save_name
 
 
 def init_db():
@@ -266,7 +266,7 @@ def download(post_id):
     if not can_read(post):  # 비밀글 첨부파일도 비밀번호를 맞혀야 받을 수 있다
         abort(403)
     return send_from_directory(UPLOAD_DIR, post["file_path"],
-                               as_attachment=True, download_name=lost["file_name"])
+                               as_attachment=True, download_name=post["file_name"])
     
 
 @app.route("/post/<int:post_id>/edit", methods=["GET", "POST"])
