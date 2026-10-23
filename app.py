@@ -83,26 +83,19 @@ def init_db():
     db_execute("""
         CREATE TABLE IF NOT EXISTS boards (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            board_id INT NOT NULL,
-            user_id INT NOT NULL,
-            title VARCHAR(200) NOT NULL,
-            content TEXT NOT NULL,
-            secret_pw_hash VARCHAR(255),
-            file_name VARCHAR(255),
-            file_path VARCHAR(255),
-            create_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            INDEX (board_id)
+            name VARCHAR(100) NOT NULL UNIQUE,
+            description VARCHAR(255) NOT NULL DEFAULT '',
+            create_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
    # 기본 게시판 만들기 (이미 있으면 IGNORE 가 조용히 넘어간다)
     db_execute("""
-        INSERT IGNORE INTO boards (name, description) VALUES (%s, %s)",
-        VALUES
+        INSERT IGNORE INTO boards (name, description) VALUES
             ('자유게시판', '자유롭게 글을 쓸 수 있는 게시판입니다.'),
             ('공지사항', '중요한 공지사항을 확인할 수 있는 게시판입니다.'),
             ('질문과 답변', '질문과 답변을 주고받는 게시판입니다.')
-        """)         
+    """)         
 
 
 @app.route("/")
