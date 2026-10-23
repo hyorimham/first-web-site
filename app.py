@@ -390,7 +390,7 @@ def reset_pw_new():
             return render_template("reset_pw_new.html", error="새 비밀번호는 8자 이상이어야 합니다.")
 
         db_execute(
-            "UPDATE users SET passowrd_hash = %s WHERE id = %s",
+            "UPDATE users SET password_hash = %s WHERE id = %s",
             (generate_password_hash(new_pw), user_id)
         )
         session.pop("reset_user_id")    # 다 썼으면 지운다
