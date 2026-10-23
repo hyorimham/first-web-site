@@ -19,6 +19,7 @@
     <h1>{{ post.title }}</h1>
 
     <div class="article-meta">
+      <span>작성자 {{ post.username }}</span>
       <span>작성일</span>
       <time>{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</time>
     </div>
@@ -32,6 +33,7 @@
       목록으로
     </a>
 
+    {% if session.user_id == post.user_id %}
     <div class="action-group">
       <a class="button secondary"
          href="{{ url_for('edit', post_id=post.id) }}">
@@ -48,6 +50,7 @@
         </button>
       </form>
     </div>
+    {% endif %}
   </footer>
 </article>
 {% endblock %}

@@ -58,6 +58,12 @@ def find_one(sql, params=()):
     return rows[0]
 
 
+def check_owner(post):
+    # 내 글이 아니면 403 (로그인 안 했으면 session.get 이 None이라 역시 403)
+    if post["user_id"] != session.get("user_id"):
+        abort(403)
+
+
 def init_db():
     # MySQL 컨테이너가 켜질 때 까지 2초 간격으로 최대 30번 기다린다
     for _ in range(30):
@@ -177,8 +183,9 @@ def board_view(board_id):
 @app.route("/board/<int:board_id>/write", methods=["GET", "POST"])
 def write(board_id):
     # Create
-    board = find_one("SELECT * FROM boards WHERE id = %s",
-(board_id,))
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    board = find_one("SELECT * FROM boards WHERE id = %s",(board_id,))
     
     if request.method == "POST":
         title = request.form["title"].strip()
@@ -187,8 +194,8 @@ def write(board_id):
             abort(400)
 
         post_id = db_execute(
-            "INSERT INTO posts (board_id, title, content) VALUES (%s, %s, %s)",
-            (board_id, title, content),
+            "INSERT INTO posts (board_id, user_id, title, content) VALUES (%s, %s, %s, %s)",
+            (board_id, session["user_id"], title, content),
         )
         return redirect(url_for("view", post_id=post_id))
 
@@ -200,11 +207,13 @@ def write(board_id):
 def view(post_id):
     # Read
     post = find_one("""
-        SELECT p.*, b.name AS board_name
+        SELECT p.*, b.name AS board_name, u.username
         FROM posts p
         JOIN boards b ON p.board_id = b.id
+        JOIN users u ON p.user_id = u.id
         WHERE p.id = %s
     """, (post_id,))
+    check_owner(post)
     return render_template("view.html", post=post)
 
 
@@ -212,6 +221,7 @@ def view(post_id):
 def edit(post_id):
     # Update
     post = find_one("SELECT * FROM posts WHERE id = %s", (post_id,))
+    check_owner(post)
 
     if request.method == "POST":
         title = request.form["title"].strip()
@@ -232,7 +242,8 @@ def edit(post_id):
 @app.route("/post/<int:post_id>/delete", methods=["POST"])
 def delete(post_id):
     # Delete
-    post = find_one("SELECT board_id FROM posts WHERE id = %s", (post_id,))
+    post = find_one("SELECT board_id, user_id FROM posts WHERE id = %s", (post_id,))
+    check_owner(post)
     db_execute("DELETE FROM posts WHERE id = %s", (post_id,))
     return redirect(url_for("board_view", board_id=post["board_id"]))
 
