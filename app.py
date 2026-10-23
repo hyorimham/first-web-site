@@ -1,6 +1,7 @@
 import os
 import time
 import pymysql
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, redirect, abort, url_for
 
 app = Flask(__name__)
@@ -72,7 +73,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(50) NOT NULL UNIQUE,
-            password VARCHAR(255) NOT NULL,
+            password_hash VARCHAR(255) NOT NULL,
             name VARCHAR(50) NOT NULL,
             email VARCHAR(100) NOT NULL UNIQUE,
             school VARCHAR(100) NOT NULL DEFAULT '',
@@ -85,7 +86,7 @@ def init_db():
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(100) NOT NULL UNIQUE,
             description VARCHAR(255) NOT NULL DEFAULT '',
-            create_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     """)
     db_execute("""
@@ -97,7 +98,7 @@ def init_db():
             content TEXT NOT NULL,
             secret_pw_hash VARCHAR(255),
             file_name VARCHAR(255),
-            ffile_path VARCHAR(255),
+            file_path VARCHAR(255),
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             INDEX (board_id)
         )
@@ -234,6 +235,32 @@ def delete(post_id):
     post = find_one("SELECT board_id FROM posts WHERE id = %s", (post_id,))
     db_execute("DELETE FROM posts WHERE id = %s", (post_id,))
     return redirect(url_for("board_view", board_id=post["board_id"]))
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        username = request.form["username"].strip()
+        password = request.form["password"]
+        name = request.form["name"].strip()
+        email = request.form["email"].strip()
+        school = request.form["school"].strip()
+
+        if not username or not name or not email or len(password) < 8:
+            return render_template("signup.html", error="필수 항목을 입력하고, 비밀번호는 8자 이상이어야 합니다.")
+
+        try:
+            db_execute(
+                "INSERT INTO users (username, password_hash, name, email, school) VALUES (%s, %s, %s, %s, %s)",
+                (username, generate_password_hash(password), name, email, school)
+            )
+        except pymysql.err.IntegrityError:  # username 또는 email이 UNIQUE 제약 조건에 위배될 때 발생
+            return render_template("signup.html", error="이미 존재하는 사용자 아이디 또는 이메일입니다.")
+
+        return redirect(url_for("index"))
+
+    return render_template("signup.html")
+
 
 
 @app.errorhandler(404)

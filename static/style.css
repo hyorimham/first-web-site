@@ -897,3 +897,8 @@ textarea {
     flex-wrap: wrap;
   }
 }
+  .list-error {
+    color: var(--danger);
+    font-size: 13px;
+    font-weight: 700;
+  }
