@@ -160,20 +160,20 @@ def board_view(board_id):
     search = request.args.get("search", "").strip()
     search_type = request.args.get("search_type", "all")
 
-    sql = "SELECT id,title,created_at FROM posts WHERE board_id = %s"
+    sql = "SELECT id, title, created_at, secret_pw_hash FROM posts WHERE board_id = %s"
     params = [board_id]
 
     if search:
         keyword = f"%{search}%"  # LIKE '%검색어%' = 검색어가 들어간 글
         if search_type == "title":
-            sql += " AND title LIKE %s"
+            sql += " AND title LIKE %s AND secret_pw_hash IS NULL"
             params.append(keyword)
         elif search_type == "content":
             sql += " AND content LIKE %s"
             params.append(keyword)
         else:
             search_type = "all"
-            sql += " AND (title LIKE %s OR content LIKE %s)"
+            sql += " AND (title LIKE %s OR content LIKE %s AND secret_pw_hash IS NULL))"
             params += [keyword, keyword]
 
     posts = db_select(sql + " ORDER BY id DESC", params)
@@ -190,12 +190,13 @@ def write(board_id):
     if request.method == "POST":
         title = request.form["title"].strip()
         content = request.form["content"].strip()
+        secret_pw = request.form.get("secret_pw", "")
         if not title or not content or len(title) > 200:
             abort(400)
 
         post_id = db_execute(
-            "INSERT INTO posts (board_id, user_id, title, content) VALUES (%s, %s, %s, %s)",
-            (board_id, session["user_id"], title, content),
+            "INSERT INTO posts (board_id, user_id, title, content, secret_pw) VALUES (%s, %s, %s, %s, %s)",
+            (board_id, session["user_id"], title, content, secret_pw_hash),
         )
         return redirect(url_for("view", post_id=post_id))
 
@@ -213,7 +214,14 @@ def view(post_id):
         JOIN users u ON p.user_id = u.id
         WHERE p.id = %s
     """, (post_id,))
-    check_owner(post)
+
+    # 비밀글이고 내 글이 아니면 비밀번호를 확인한다
+    if post["secret_pw_hash"] and post[user_id] != session.get("user_id"):
+        secret_pw = request.form.get("secret_pw", "")
+        if not check_password_hash(post["secret_pw_hash"], secret_pw):
+            error = "비밀번호가 올바르지 않습니다." if secret_pw else None
+            return render_template("scret.html",post=post, error=error)
+
     return render_template("view.html", post=post)
 
 
