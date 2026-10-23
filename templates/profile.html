@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_me %}내 프로필{% else %}{{ user.username }}님의 프로필{% endif %}{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <span class="eyebrow">PROFILE</span>
+  <h1>{% if is_me %}내 프로필{% else %}{{ user.username }}님의 프로필{% endif %}</h1>
+</section>
+
+<section class="form-panel profile-panel">
+  <h2>{{ user.name }} <span class="muted">@{{ user.username }}</span></h2>
+  <p>학교: {{ user.school or '입력하지 않음' }}</p>
+  {% if is_me %}
+    <p>이메일: {{ user.email }}</p>
+  {% endif %}
+  <p class="muted">가입일: {{ user.created_at.strftime('%Y-%m-%d') }}</p>
+</section>
+
+<section class="post-section">
+  <h2>작성한 글 {{ posts|length }}개</h2>
+
+  <div class="post-list">
+    {% for post in posts %}
+      <a class="post-row" href="{{ url_for('view', post_id=post.id) }}">
+        <div class="post-info">
+          <h3>{% if post.secret_pw_hash %}🔒 {% endif %}{{ post.title }}</h3>
+          <span class="post-date">{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+        </div>
+        <span class="post-arrow">↗</span>
+      </a>
+    {% else %}
+      <div class="empty-state">아직 작성한 글이 없습니다.</div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

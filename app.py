@@ -405,6 +405,29 @@ def logout():
     return redirect(url_for("index"))
 
 
+@app.route("/user/<username>")
+def profile(username):
+    # 회원 프로필 (누구나 볼 수 있음)
+    user = find_one(
+        "SELECT id, username, name, email, school, profile_image, create_at FROM users WHERE username = %s",
+        (username)
+    )
+    posts = db_select(
+        "SELECT id, username, name, email, school, profile_image, create_at FROM users WHERE username = %s",
+        (user["id"])
+    )
+    is_me = user["id"] == session.get("user_id")
+    return render_template("profile.html", user=user, posts=posts, is_me=is_me)
+
+
+@app.route("/me")
+def my_profile():
+    # 내 프로필 = 로그인한 내 아이디의 프로필 페이지
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    return redirect(url_for("profile", username=session["username"]))
+
+
 @app.errorhandler(404)
 def not_found(e):
     return render_template("404.html"), 404

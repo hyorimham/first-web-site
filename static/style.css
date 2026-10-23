@@ -902,3 +902,6 @@ textarea {
     font-size: 13px;
     font-weight: 700;
   }
+  .profile-panel {
+    margin-bottom: 24px;
+  }
