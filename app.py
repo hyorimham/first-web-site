@@ -409,12 +409,12 @@ def logout():
 def profile(username):
     # 회원 프로필 (누구나 볼 수 있음)
     user = find_one(
-        "SELECT id, username, name, email, school, profile_image, create_at FROM users WHERE username = %s",
-        (username)
+        "SELECT id, username, name, email, school, profile_image, created_at FROM users WHERE username = %s",
+        (username,),
     )
     posts = db_select(
-        "SELECT id, username, name, email, school, profile_image, create_at FROM users WHERE username = %s",
-        (user["id"])
+        "SELECT id, title, created_at, secret_pw_hash FROM posts WHERE user_id = %s ORDER BY id DESC",
+        (user["id"],),
     )
     is_me = user["id"] == session.get("user_id")
     return render_template("profile.html", user=user, posts=posts, is_me=is_me)
