@@ -26,6 +26,11 @@
   </header>
 
   <div class="article-content">{{ post.content }}</div>
+    {% if post.file_name %}
+  <p class="muted">📎 첨부파일:
+    <a href="{{ url_for('download', post_id=post.id) }}">{{ post.file_name }}</a>
+  </p>
+  {% endif %}
 
   <footer class="article-actions">
     <a class="button secondary"

@@ -1,12 +1,17 @@
 import os
 import time
+import uuid
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, render_template, request, redirect, abort, url_for, session
+from flask import Flask, render_template, request, redirect, abort, url_for, session, send_from_directory
 
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]  # .env 파일에 SECRET_KEY=랜덤문자열 을 넣어야 한다
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # 업로드 최대 5MB
 
+UPLOAD_DIR = os.path.join(app.root_path, "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+ALLOWED_EXT = {"png", "jpg", "jpeg", "gif", "pdf", "txt", "zip", "hwp", "docx", "pptx", "xlsx"}
 
 def get_db():
     """기존 .env 파일의 설정으로 MySQL에 연결한다."""
@@ -62,6 +67,28 @@ def check_owner(post):
     # 내 글이 아니면 403 (로그인 안 했으면 session.get 이 None이라 역시 403)
     if post["user_id"] != session.get("user_id"):
         abort(403)
+
+
+def can_read(post):
+    # 일반 글, 내 글, 비밀번호를 맞힌 비밀글이면 읽을 수 있다
+    return (not post["secret_pw_hash"]
+            or post["user_id"] == session.get("user_id")
+            or session.get(f"unlock_{post['id']}"))
+
+
+def save_upload(file, allowed=ALLOWED_EXT):
+    # 파일을 uploads 폴더에 저장하고 (원래 이름, 저장한 이름) 을 돌려준다
+    if not file or not file.filename:
+        return None, None   # 파일을 안 올렸으면
+
+    ext = file.filename.replit(".",1)[-1].lower()
+    if "." not in file.filename or ext not in allowed:
+        abort(400, description="허용되지 않은 파일 형식입니다.")
+
+
+    save_name = f"{uuid.uuid4().hex}.{ext}"  # 겹치치 않는 랜덤 이름
+    file.save(os.path.join(UPLOAD_DIR, save_name))
+    return file.filename. save_name
 
 
 def init_db():
@@ -196,10 +223,12 @@ def write(board_id):
 
         # 비밀번호를 입력했으면 비밀글 (해시로 저장), 비워두면 일반 글 (NULL)
         secret_pw_hash = generate_password_hash(secret_pw) if secret_pw else None
+        file_name, file_path = save_upload(request.files.get("file"))
 
         post_id = db_execute(
-            "INSERT INTO posts (board_id, user_id, title, content, secret_pw_hash) VALUES (%s, %s, %s, %s, %s)",
-            (board_id, session["user_id"], title, content, secret_pw_hash),
+            "INSERT INTO posts (board_id, user_id, title, content, secret_pw_hash, file_name, file_path) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (board_id, session["user_id"], title, content, secret_pw_hash, file_name, file_path)
         )
         return redirect(url_for("view", post_id=post_id))
 
@@ -219,14 +248,26 @@ def view(post_id):
     """, (post_id,))
 
     # 비밀글이고 내 글이 아니면 비밀번호를 확인한다
-    if post["secret_pw_hash"] and post["user_id"] != session.get("user_id"):
+    if not can_read(post):
         secret_pw = request.form.get("secret_pw", "")
         if not check_password_hash(post["secret_pw_hash"], secret_pw):
             error = "비밀번호가 올바르지 않습니다." if secret_pw else None
             return render_template("secret.html", post=post, error=error)
+        session[f"unlock_{post_id}"] = True  # 맞혔으면 기억 (첨부파일 다운로드용)
 
     return render_template("view.html", post=post)
 
+
+@app.route("/post/<int:post_id>/download")
+def download(post_id):
+    post = find_one("SELECT * FROM posts WHERE id = %s", (post_id,))
+    if not post["file_path"]:
+        abort(404)
+    if not can_read(post):  # 비밀글 첨부파일도 비밀번호를 맞혀야 받을 수 있다
+        abort(403)
+    return send_from_directory(UPLOAD_DIR, post["file_path"],
+                               as_attachment=True, download_name=lost["file_name"])
+    
 
 @app.route("/post/<int:post_id>/edit", methods=["GET", "POST"])
 def edit(post_id):

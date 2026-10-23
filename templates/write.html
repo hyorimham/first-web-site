@@ -20,6 +20,7 @@
     class="post-form"
     action="{{ url_for('write', board_id=board.id) }}"
     method="post"
+    enctype="multipart/form-data"
   >
     <div class="form-group">
       <label for="title">제목</label>
@@ -47,6 +48,11 @@
     <div class="form-group">
       <label for="secret_pw">비밀글 비밀번호 <span class="muted">(비워두면 일반 글)</span></label>
       <input id="secret_pw" name="secret_pw" type="password">
+    </div>
+
+    <div class=""form-group">
+      <label for="file">첨부파일 <span class="muted">(선택, 5MB 이하)</span></label>
+      <input id=""file" name="file" type="file">
     </div>
 
     <div class="form-actions">

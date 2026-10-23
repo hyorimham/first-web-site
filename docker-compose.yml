@@ -11,8 +11,11 @@ services:
     env_file: .env
     ports:
       - "5000:5000"
+    volumes:
+      - uploads:/app/uploads
     depends_on:
       - db
 
 volumes:
   db_data:
+  uploads:
